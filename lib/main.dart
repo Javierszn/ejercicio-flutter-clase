@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mi_primera_app/features/home/screens/home_screen.dart';
+import 'package:mi_primera_app/features/backlog/screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,14 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fitness Tracker',
+      title: 'Backlog Tracker', 
       theme: ThemeData(
-       
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(),
+      home: const BacklogHomeScreen(),
     );
   }
 }
-
-
