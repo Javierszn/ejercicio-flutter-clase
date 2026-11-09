@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mi_primera_app/features/auth/services/auth_service.dart';
 import 'package:mi_primera_app/features/auth/widgets/custom_text_field.dart';
-import 'package:mi_primera_app/features/home/screens/home_screen.dart';
+import 'package:mi_primera_app/features/workouts/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,8 +11,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController(
+    text: "emilys",
+  );
+  final TextEditingController _passwordController = TextEditingController(
+    text: "emilyspass",
+  );
+
   final AuthService _authService = AuthService();
   bool _isLoading = false;
 
@@ -21,25 +26,31 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
+    bool success = await _authService.login(
+      _usernameController.text,
+      _passwordController.text,
+    );
 
-    final success = await _authService.login(username, password);
+    if (!mounted) return;
 
     setState(() {
       _isLoading = false;
     });
 
-    if (!mounted) return;
-
     if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Inicio de sesión exitoso")),
+      );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const MyHomePage()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Credenciales incorrectas o error al conectar')),
+        const SnackBar(
+          content: Text("Error al iniciar sesión"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -67,20 +78,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
-              CustomTextField(controller: _usernameController, label: "Usuario"),
-              const SizedBox(height: 16),
-              CustomTextField(controller: _passwordController, label: "Contraseña"),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _iniciarSesion,
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Iniciar Sesión'),
+              CustomTextField(
+                controller: _usernameController,
+                label: "Usuario",
               ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: _passwordController,
+                label: "Contraseña",
+              ),
+              const SizedBox(height: 32),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: _iniciarSesion,
+                      child: const Text(
+                        "Iniciar Sesión",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
             ],
           ),
         ),
