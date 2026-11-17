@@ -1,5 +1,5 @@
-import 'package:mi_primera_app/features/auth/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:mi_primera_app/features/weight/screens/weight_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,8 +12,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'FitTrackPro',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent)),
-      home: const LoginScreen(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+      ),
+      home: const WeightScreen(),
     );
   }
 }
