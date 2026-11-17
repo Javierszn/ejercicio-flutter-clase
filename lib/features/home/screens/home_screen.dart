@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_primera_app/features/home/screens/add_workout_screen.dart';
 import 'package:mi_primera_app/features/workouts/models/workout_model.dart';
 import 'package:mi_primera_app/features/workouts/services/local_workout_service.dart';
 
@@ -34,63 +35,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _showAddWorkoutDialog() {
-    final titleController = TextEditingController();
-    final categoryController = TextEditingController();
-    final durationMinutesController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Nueva rutina'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: "Nombre"),
-            ),
-            TextField(
-              controller: categoryController,
-              decoration: const InputDecoration(labelText: "Categoría"),
-            ),
-            TextField(
-              controller: durationMinutesController,
-              decoration: const InputDecoration(labelText: "Duración (minutos)"),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text("Cancelar"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (titleController.text.isNotEmpty &&
-                  durationMinutesController.text.isNotEmpty &&
-                  categoryController.text.isNotEmpty) {
-                final newWorkout = WorkoutModel(
-                  title: titleController.text.trim(),
-                  category: categoryController.text.trim(),
-                  durationMinutes:
-                      int.tryParse(durationMinutesController.text.trim()) ?? 0,
-                );
-
-                await _dbService.insertWorkout(newWorkout);
-
-                if (dialogContext.mounted) {
-                  Navigator.pop(dialogContext);
-                }
-                _loadWorkouts();
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
+  Future<void> _navigateToAddWorkout() async {
+    final newWorkout = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddWorkoutScreen()),
     );
+
+    if (newWorkout != null && newWorkout is WorkoutModel) {
+      await _dbService.insertWorkout(newWorkout);
+      _loadWorkouts();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Rutina creada exitosamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
   }
 
   void _showEditWorkoutDialog(WorkoutModel workout) {
@@ -219,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddWorkoutDialog,
+        onPressed: _navigateToAddWorkout,
         child: const Icon(Icons.add),
       ),
     );
