@@ -6,7 +6,6 @@ class LocalWorkoutService {
   final dbHelper = DatabaseHelper.instance;
   static final List<WorkoutModel> _webWorkouts = [];
 
-  //Crear
   Future<int> insertWorkout(WorkoutModel workout) async {
     if (kIsWeb) {
       final id = _webWorkouts.isEmpty
@@ -29,7 +28,6 @@ class LocalWorkoutService {
     return await db.insert('workouts', map);
   }
 
-  //Lectura
   Future<List<WorkoutModel>> getWorkouts() async {
     if (kIsWeb) {
       return List<WorkoutModel>.from(_webWorkouts);
@@ -43,10 +41,9 @@ class LocalWorkoutService {
     });
   }
 
-  //Actualización
   Future<int> updateWorkout(WorkoutModel workout) async {
     if (kIsWeb) {
-      final index = _webWorkouts.indexWhere((w) => w.localId == workout.localId);
+      final index = _webWorkouts.indexWhere((w) => w.localId == (workout.id ?? workout.localId));
       if (index != -1) {
         _webWorkouts[index] = workout;
         return 1;
@@ -59,11 +56,10 @@ class LocalWorkoutService {
       'workouts',
       workout.toMap(),
       where: 'id = ?',
-      whereArgs: [workout.localId],
+      whereArgs: [workout.id ?? workout.localId],
     );
   }
 
-  //Eliminación
   Future<int> deleteWorkout(int id) async {
     if (kIsWeb) {
       _webWorkouts.removeWhere((w) => w.localId == id);
