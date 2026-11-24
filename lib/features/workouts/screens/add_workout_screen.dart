@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mi_primera_app/features/workouts/models/workout_model.dart';
 
 class AddWorkoutScreen extends StatefulWidget {
-  const AddWorkoutScreen({super.key});
+  final WorkoutModel? workoutToEdit;
+
+  const AddWorkoutScreen({super.key, this.workoutToEdit});
 
   @override
   State<AddWorkoutScreen> createState() => _AddWorkoutScreenState();
@@ -16,9 +18,21 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   String _selectedCategory = "Fuerza";
   final List<String> _categories = ['Fuerza', 'Cardio', 'Flexibilidad'];
 
-  void _saveWorkout() {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.workoutToEdit != null) {
+      _titleController.text = widget.workoutToEdit!.title;
+      _selectedCategory = widget.workoutToEdit!.category;
+      _durationController.text = widget.workoutToEdit!.durationMinutes.toString();
+    }
+  }
+
+  void _guardarRutina() {
     if (_formKey.currentState!.validate()) {
       final newWorkout = WorkoutModel(
+        id: widget.workoutToEdit?.id,
+        localId: widget.workoutToEdit?.localId,
         title: _titleController.text.trim(),
         category: _selectedCategory,
         durationMinutes: int.parse(_durationController.text.trim()),
@@ -37,9 +51,11 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.workoutToEdit != null;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nueva rutina'),
+        title: Text(isEditing ? 'Editar Rutina' : 'Crear Nueva Rutina'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
       ),
@@ -109,7 +125,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
               ),
               const Spacer(),
               ElevatedButton(
-                onPressed: _saveWorkout,
+                onPressed: _guardarRutina,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Colors.blueAccent,
@@ -118,9 +134,9 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Guardar rutina',
-                  style: TextStyle(fontSize: 18),
+                child: Text(
+                  isEditing ? 'Actualizar Rutina' : 'Guardar Rutina',
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
             ],

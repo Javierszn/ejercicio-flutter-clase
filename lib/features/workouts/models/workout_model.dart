@@ -1,22 +1,22 @@
 class WorkoutModel {
   final int? localId;
-  //final int? apiId;
   final String title;
   final String category;
   final int durationMinutes;
 
+  int? get id => localId;
+
   WorkoutModel({
-    this.localId,
-    //this.apiId,
+    int? localId,
+    int? id,
     required this.title,
     required this.category,
     required this.durationMinutes,
-  });
+  }) : localId = localId ?? id;
 
   Map<String, dynamic> toMap() {
     return {
       'id': localId,
-      //'api_id': apiId,
       'title': title,
       'category': category,
       'duration_minutes': durationMinutes,
@@ -26,7 +26,6 @@ class WorkoutModel {
   factory WorkoutModel.fromMap(Map<String, dynamic> map) {
     return WorkoutModel(
       localId: map['id'],
-      //apiId: map['api_id'],
       title: map['title'],
       category: map['category'],
       durationMinutes: map['duration_minutes'],

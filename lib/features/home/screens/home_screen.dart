@@ -55,72 +55,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _showEditWorkoutDialog(WorkoutModel workout) {
-    final titleController = TextEditingController(text: workout.title);
-    final categoryController = TextEditingController(text: workout.category);
-    final durationMinutesController =
-        TextEditingController(text: workout.durationMinutes.toString());
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Editar rutina'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: "Nombre"),
-            ),
-            TextField(
-              controller: categoryController,
-              decoration: const InputDecoration(labelText: "Categoría"),
-            ),
-            TextField(
-              controller: durationMinutesController,
-              decoration: const InputDecoration(labelText: "Duración (minutos)"),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text("Cancelar"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (titleController.text.isNotEmpty &&
-                  durationMinutesController.text.isNotEmpty &&
-                  categoryController.text.isNotEmpty) {
-                final updatedWorkout = WorkoutModel(
-                  localId: workout.localId,
-                  title: titleController.text.trim(),
-                  category: categoryController.text.trim(),
-                  durationMinutes:
-                      int.tryParse(durationMinutesController.text.trim()) ?? 0,
-                );
-
-                await _dbService.updateWorkout(updatedWorkout);
-
-                if (dialogContext.mounted) {
-                  Navigator.pop(dialogContext);
-                }
-                if (mounted) {
-                  _loadWorkouts();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Rutina actualizada: ${updatedWorkout.title}'),
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Actualizar'),
-          ),
-        ],
+  Future<void> _navegarYEditarRutina(WorkoutModel workout) async {
+    final rutinaEditada = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddWorkoutScreen(workoutToEdit: workout),
       ),
     );
+
+    if (rutinaEditada != null && rutinaEditada is WorkoutModel) {
+      await _dbService.updateWorkout(rutinaEditada);
+      if (mounted) {
+        _loadWorkouts();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Rutina actualizada')),
+        );
+      }
+    }
   }
 
   Future<void> _deleteWorkout(int id, String title) async {
@@ -165,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              onPressed: () => _showEditWorkoutDialog(workout),
+                              onPressed: () => _navegarYEditarRutina(workout),
                               icon: const Icon(Icons.edit, color: Colors.blueAccent),
                             ),
                             IconButton(
@@ -175,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        onTap: () => _showEditWorkoutDialog(workout),
+                        onTap: () => _navegarYEditarRutina(workout),
                       ),
                     );
                   },
